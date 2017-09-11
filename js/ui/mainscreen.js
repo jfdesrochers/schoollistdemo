@@ -161,7 +161,7 @@ MainScreen.pages.PrintClass = {
             }
         }
         self.getPDFPath = function (id) {
-            return `/pdfs/${id}.pdf`
+            return `pdfs/${id}.pdf`
         }
         self.printList = function (e) {
             e.preventDefault()
