@@ -14,7 +14,7 @@
         <div id="modalcontainer"></div>
         <div id="shcontents"></div>
 
-        <script>window.$ = window.jQuery = require('jquery')</script>
+        <script src="vendor/js/jquery.min.js"></script>
         <script src="vendor/js/bootstrap.min.js"></script>
         <script>
             //Disable Dragging into the Window
@@ -32,27 +32,7 @@
                 return false;
             }, false);
         </script>
-        <script src="js/app.js"></script>
-
-        <!--For Debug !-->
-        <script>
-            $(document).bind("keydown", (e) => {
-                if ((e.which || e.keyCode) == 116) {
-                    e.preventDefault()
-                    m.route.set('/')
-                    sessionStorage.clear()
-                    location.reload()
-                } else if ((e.which || e.keyCode) == 119) {
-                    const {remote} = require('electron');
-                    remote.getCurrentWindow().toggleDevTools()
-                } else if ((e.which || e.keyCode) == 13 && e.altKey) {
-                    const {remote} = require('electron');
-                    const win = remote.getCurrentWindow()
-                    win.setFullScreen(!win.isFullScreen())
-                }
-            });
-        </script>
-
+        <script src="js/app.min.js"></script>
         <script src="vendor/js/pdf.js"></script>
         <script>
             PDFJS.workerSrc = 'vendor/js/pdf.worker.js';

@@ -1,12 +1,10 @@
 const m = require('mithril')
 const t = require('jfdcomponents').Translator
-const Config = require('electron-config')
 
-const conf = new Config()
+const conf = require('./configstorage.js')
 
-const DataStorage = require('./js/datastorage.js')
-const {Tutorial} = require('./js/ui/tutorial.js')
-const MainScreen = require('./js/ui/mainscreen.js')
+const DataStorage = require('./datastorage.js')
+const MainScreen = require('./ui/mainscreen.js')
 
 const Startup = {}
 
@@ -16,12 +14,8 @@ Startup.oncreate = function () {
             'en': 'messages/en.yaml',
             'fr': 'messages/fr.yaml'
         }).then(() => DataStorage.loadDBs(['schools', 'stats'])).then(() => {
-            if (conf.get('tutorialcompleted')) {
-                t.setLang(conf.get('defaultlanguage'))
-                m.route.set('/mainscreen')
-            } else {
-                m.route.set('/tutorial')
-            }
+            t.setLang(conf.get('defaultlanguage'))
+            m.route.set('/mainscreen')
         })
     }, 2000) // Wait until the fadein has stopped.
 }
@@ -35,8 +29,9 @@ Startup.view = function () {
     ]
 }
 
+location.hash = ''
+
 m.route(document.getElementById('shcontents'), '/', {
     '/': Startup,
-    '/tutorial': Tutorial,
     '/mainscreen': MainScreen
 })

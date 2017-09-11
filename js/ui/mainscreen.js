@@ -1,24 +1,16 @@
 const m = require('mithril')
 const {Animator} = require('jfdcomponents')
 const t = require('jfdcomponents').Translator
-const Config = require('electron-config')
 const _ = require('lodash')
 const UniqueRandom = require('../utils/uniquerandom.js')
-const {remote} = require('electron')
-const path = require('path')
 
-const {exec} = require('child_process')
-
-const conf = new Config()
+const conf = require('../configstorage.js')
 const anim = new Animator('mainscreen')
 
 const DataStorage = require('../datastorage.js')
-const RemoteAccess = require('../remoteaccess.js')
 const {tutWindow} = require('./tutorial.js')
 
-const Settings = require('./settings.js')
 const MainScreen = {pages: {}}
-_.assign(MainScreen.pages, Settings.pages)
 
 MainScreen.pages.TitlePage = {
     oninit: function (vnode) {
@@ -36,13 +28,6 @@ MainScreen.pages.TitlePage = {
             }
         }
 
-        self.goToSettings = function (lang) {
-            return (e) => {
-                e.preventDefault()
-                t.setLang(lang)
-                vnode.attrs.changePage('stPassCode')
-            }
-        }
     },
     view: function () {
         let self = this
@@ -51,12 +36,12 @@ MainScreen.pages.TitlePage = {
             m('h1.dualtitle.secondary', m.trust(t('maintitle', self.seclang))),
             m('a[href="#"]', {onclick: self.goToSchools(self.mainlang)}, m('h1.dualsubtitle.white.bordered', m.trust(t('dualsubtitle', self.mainlang)))),
             m('a[href="#"]', {onclick: self.goToSchools(self.seclang)}, m('h1.dualsubtitle.secondary.bordered', m.trust(t('dualsubtitle', self.seclang)))),
-            m('img.duallogo', {src: t('stapleslogo', self.mainlang), ondblclick: self.goToSettings(self.mainlang)}),
-            m('img.duallogo.secondary', {src: t('stapleslogo', self.seclang), ondblclick: self.goToSettings(self.seclang)})
+            m('img.duallogo', {src: t('stapleslogo', self.mainlang)}),
+            m('img.duallogo.secondary', {src: t('stapleslogo', self.seclang)})
         ] : [
             m('h1.maintitle.white', m.trust(t('maintitle'))),
             m('a[href="#"]', {onclick: self.goToSchools(self.mainlang)}, m('h1.mainsubtitle.white.bordered', m.trust(t('mainsubtitle')))),
-            m('img.mainlogo', {src: t('stapleslogo'), ondblclick: self.goToSettings(self.mainlang)})
+            m('img.mainlogo', {src: t('stapleslogo')})
         ])
     }
 }
@@ -176,31 +161,15 @@ MainScreen.pages.PrintClass = {
             }
         }
         self.getPDFPath = function (id) {
-            return path.join(remote.app.getPath('userData'), 'pdfs', id + '.pdf')
+            return `/pdfs/${id}.pdf`
         }
         self.printList = function (e) {
             e.preventDefault()
             self.printstatus = 'nowprinting'
-            exec('"' + path.join(remote.app.getAppPath(), 'printhelper', 'SumatraPDF.exe') + '" -print-to-default -print-settings "fit" -silent "' + self.getPDFPath(self.classID.id) + '"', (err) => {
-                if (err) {
-                    console.error('[Printing] Error while printing', err)
-                    self.printstatus = 'printerror'
-                    m.redraw()
-                } else {
-                    if (self.allstats[self.classID.id]) {
-                        self.allstats[self.classID.id] = self.allstats[self.classID.id] + 1
-                    } else {
-                        self.allstats[self.classID.id] = 1
-                    }
-                    DataStorage.replace('stats', '', self.allstats).then(() => {
-                        RemoteAccess.sendStoreData({stats: self.allstats}).catch((err) => {
-                            console.error('[Request]', err)
-                        })
-                        self.printstatus = 'doneprinting'
-                        m.redraw()
-                    })
-                }
-            })
+            setTimeout(() => {
+                self.printstatus = 'doneprinting'
+                m.redraw()
+            }, 2000)
         }
     },
     

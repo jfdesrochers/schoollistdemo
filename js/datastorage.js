@@ -1,27 +1,20 @@
-const storage = require('electron-json-storage')
-const _ = require('lodash')
-const q = require('q')
+// Since this is only a demo, the schools are preloaded in a json file and this becomes only an interface to it to avoid breaking existing code.
+const schools = require('./schools.json')
 
-let dataCache = {}
+let dataCache = {schools: schools, stats: {}}
 
 const DataStorage = {
 
-    loadDBs: function(dbList) {
-        return q.nfcall(storage.getMany, dbList).then((res) => dataCache = res).catch((err) => console.error('[StorageDB]', err))
+    loadDBs: function() {
+        return Promise.resolve()
     },
 
-    update: function(whichDB, keyName, newData) {
-        dataCache[whichDB] = _.unionBy(newData, dataCache[whichDB], (o) => o[keyName])
-        dataCache[whichDB] = _.sortBy(dataCache[whichDB], keyName)
-        return q.nfcall(storage.set, whichDB, dataCache[whichDB]).catch((err) => console.error('[StorageDB]', err))
+    update: function() {
+        return Promise.resolve()
     },
 
-    replace: function(whichDB, sortBy, newData) {
-        dataCache[whichDB] = _.cloneDeep(newData)
-        if (sortBy) {
-            dataCache[whichDB] = _.sortBy(dataCache[whichDB], sortBy)
-        }
-        return q.nfcall(storage.set, whichDB, dataCache[whichDB]).catch((err) => console.error('[StorageDB]', err))
+    replace: function() {
+        return Promise.resolve()
     },
 
     getAllData: function(whichDB) {
